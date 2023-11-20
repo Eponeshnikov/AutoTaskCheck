@@ -562,6 +562,8 @@ questions:
 ### Submission Header:
 This table represents the initial details of submissions in an Excel (.xlsx) format.
 
+If there is a link to the file in submission, then downloading only from Yandex disk is supported.
+
 <table>
   <tr>
     <th>ID</th>
