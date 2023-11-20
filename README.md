@@ -22,7 +22,7 @@ This is an automated checking system for grading student assignments and tests. 
 
 ## Installation
 
-Requires Python 3.6+. Install requirements:
+Requires Python 3.10+. Install requirements:
 
 ```bash
 pip install -r requirements.txt
@@ -34,6 +34,11 @@ To run checker:
 
 ```bash
 streamlit run 1_📈_AutoChecker.py
+```
+
+Go to:
+```plaintext
+http://localhost:8501
 ```
 
 The checker requires a YAML config file and an Excel submissions file:
@@ -134,7 +139,7 @@ System parameters define high-level settings for the checker.
 | `yatoken` | Yandex Disk authorization token for downloading submissions.                          | ⚙️ Optional | - | Token string |
 
 &nbsp;
-##### `eval_formula`
+#### `eval_formula`
 The `eval_formula` allows defining conditional logic to calculate total scores based on question scores. It is a list of formulas with the following structure:
 
 ```yaml
@@ -168,7 +173,7 @@ This doubles all question scores if q16 >= 100.
 
 The `eval_formula` allows conditional bonuses, limits, etc. based on specific question scores.
 
-##### `penalty_params` and `penalty_formula`
+#### `penalty_params` and `penalty_formula`
 
 The `penalty_params` and `penalty_formula` dictate how late submission penalties are applied by the auto checker (multiplying by generated coefficient). They configure the penalty behavior:
 

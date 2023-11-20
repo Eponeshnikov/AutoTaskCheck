@@ -2,7 +2,7 @@
 import ast
 import streamlit as st
 import warnings
-import pandas as pd
+import os
 from dataloader import DataLoader
 from check import Check
 
@@ -157,6 +157,19 @@ if show_button:
     st.dataframe(result)
 else:
     st.write(result.to_html(show_dimensions=True), unsafe_allow_html=True)
+
+try:
+    name = os.path.splitext(dataloader.match_list_file.name)[0]
+except Exception:
+    name = ""
+filename = st.text_input('Write filename', name)
+filename = filename if len(filename) > 0 else None
+write_mode = st.radio('Choose write mode:', ['outer', 'inner', 'left', 'right'],
+                      captions=['Utilize the union of ID-column from both frames (match_list and results table)',
+                                'Employ the intersection of ID-column from both frames (match_list and results table)',
+                                'Retrieve information using only the ID-column from the left frame (match_list)',
+                                'Access information using only the ID-column from the right frame (results table)',
+                                ])
 # Add a button to write results
 cols = st.columns(8)
 with cols[2]:
@@ -164,10 +177,12 @@ with cols[2]:
 
 with cols[0]:
     st.button(label="Write results",
-              on_click=lambda: dataloader.write_results(save_only_match=save_checkbox),
+              on_click=lambda: dataloader.write_results(save_only_match=save_checkbox, filename=filename,
+                                                        write_mode=write_mode),
               disabled=list_id is None or not is_matching_list)
 
 with cols[1]:
     st.button(label="Write short results",
-              on_click=lambda: dataloader.write_results(short=True, save_only_match=save_checkbox),
+              on_click=lambda: dataloader.write_results(short=True, save_only_match=save_checkbox, filename=filename,
+                                                        write_mode=write_mode),
               disabled=list_id is None or not is_matching_list)

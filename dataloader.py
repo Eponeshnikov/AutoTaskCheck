@@ -35,7 +35,7 @@ class DataLoader:
         self.results = self.results.rename(columns=ren_col)
         return self.results
 
-    def merge_match_res(self):
+    def merge_match_res(self, write_mode='outer'):
         if self.match_list is not None and self.results is not None:
             if isinstance(self.match_list.columns[0], str):
                 new_col_match_list = pd.MultiIndex.from_product([['Info'], self.match_list.columns])
@@ -46,20 +46,20 @@ class DataLoader:
             else:
                 raise Exception(f"Unknown format of columns {type(self.match_list.columns)}")
             merged_df = match_list.merge(
-                self.results, left_index=True, right_index=True, how='outer')
+                self.results, left_index=True, right_index=True, how=write_mode)
             return merged_df
 
-    def write_results(self, short=False, save_only_match=False):
+    def write_results(self, short=False, save_only_match=False, filename=None, write_mode='outer'):
         if save_only_match:
             merged_df = self.match_list
         else:
-            merged_df = self.merge_match_res()
+            merged_df = self.merge_match_res(write_mode)
         if isinstance(self.match_list_file, str):
             match_list_file_name = self.match_list_file
         else:
             match_list_file_name = self.match_list_file.name
         file_name, file_ext = os.path.splitext(match_list_file_name)
-        print(merged_df.columns)
+        file_name = file_name if filename is None else filename
         if short:
             info_columns = merged_df[['Info']]
             total_columns = merged_df.filter(like='Total (%)')

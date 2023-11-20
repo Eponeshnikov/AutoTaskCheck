@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-print(os.getcwd())
 
 st.set_page_config(layout="wide", page_title="AutoChecker", page_icon="📄")
 with open('README.md', 'r', encoding='utf-8') as f:
