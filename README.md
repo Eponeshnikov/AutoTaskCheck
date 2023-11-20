@@ -22,6 +22,12 @@ This is an automated checking system for grading student assignments and tests. 
 
 ## Installation
 
+Clone repository:
+
+```bash
+git clone https://github.com/Eponeshnikov/AutoTaskCheck.git
+```
+
 Requires Python 3.10+. Install requirements:
 
 ```bash
