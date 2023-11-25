@@ -505,7 +505,9 @@ class CheckOne:
 
         def gen_import_line(package: PackageName) -> str:
             if package.module is None:
-                return f'import {package.alias_name}'
+                if package.alias_as_name is None:
+                    return f'import {package.alias_name}'
+                else: return f'import {package.alias_name} as {package.alias_as_name}'
             else:
                 if package.alias_as_name is None:
                     return f'from {package.module} import {package.alias_name}'
@@ -552,7 +554,7 @@ class CheckOne:
         for node in ast.walk(parsed_code):
             if isinstance(node, ast.Import):
                 for alias in node.names:
-                    extracted_modules.append(PackageName(alias_name=alias.name))
+                    extracted_modules.append(PackageName(alias_name=alias.name, alias_as_name=alias.asname))
             elif isinstance(node, ast.ImportFrom):
                 module = node.module
                 for alias in node.names:
