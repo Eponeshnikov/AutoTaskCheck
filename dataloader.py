@@ -2,6 +2,7 @@ import yaml
 import os
 import pandas as pd
 import re
+import streamlit as st
 
 
 class DataLoader:
@@ -57,6 +58,7 @@ class DataLoader:
                 self.results, left_index=True, right_index=True, how=write_mode
             )
             return merged_df
+        return self.results
 
     def write_results(
         self, short=False, save_only_match=False, filename=None, write_mode="outer"
@@ -68,17 +70,25 @@ class DataLoader:
         if isinstance(self.match_list_file, str):
             match_list_file_name = self.match_list_file
         else:
-            match_list_file_name = self.match_list_file.name
+            try:
+                match_list_file_name = self.match_list_file.name
+            except AttributeError:
+                match_list_file_name = filename
         file_name, file_ext = os.path.splitext(match_list_file_name)
         file_name = file_name if filename is None else filename
         if short:
-            info_columns = merged_df[["Info"]]
-            total_columns = merged_df.filter(like="Total (%)")
-            merged_df = pd.concat([info_columns, total_columns], axis=1)
-            merged_df.columns = pd.MultiIndex.from_tuples(merged_df.columns)
+            try:
+                info_columns = merged_df[["Info"]]
+                total_columns = merged_df.filter(like="Total (%)")
+                merged_df = pd.concat([info_columns, total_columns], axis=1)
+                merged_df.columns = pd.MultiIndex.from_tuples(merged_df.columns)
+            except KeyError:
+                total_columns = merged_df.filter(like="Total (%)")
+                merged_df = total_columns
             if "_short" not in file_name:
                 file_name += "_short"
         merged_df.to_excel(f"{file_name}{file_ext}")
+        st.success(f"Results saved as {file_name}{file_ext}")
 
     def load_config(self):
         """

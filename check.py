@@ -98,7 +98,7 @@ class Check:
             submission, correct_answer, check_type, filename=filename, **kwargs
         )
         check.run()
-        return check.result
+        return (check.result, check.comment)
 
     @staticmethod
     def clean_folder_name(name):
@@ -117,17 +117,20 @@ class Check:
 
     def check_submissions(self):
         """Check all submissions for each question and calculate scores."""
+  
         def process_row(row):
             nonlocal progress
             filename = self.clean_folder_name(
                 str(q) + "_" + row[self.user_params["id"]]
             )
             progress += step
-            my_bar.progress(progress, text=progress_text + f"\n\n{row[self.user_params['id']]}")
-            res = self.check_row(row[question_str], q, filename)
-            return res
-        
-        step = 1/self.submissions.shape[0]
+            my_bar.progress(
+                progress, text=progress_text + f"\n\n{row[self.user_params['id']]}"
+            )
+            result, comment = self.check_row(row[question_str], q, filename)
+            return pd.Series([result, comment], index=[q, f"{q}_comment"])
+
+        step = 1 / self.submissions.shape[0]
         progress = 0
         for q in self.questions_data.keys():
             progress_text = f"Checking {q}..."
@@ -137,9 +140,11 @@ class Check:
                 and self.questions_data[q]["Check Type"] != ""
             ):
                 question_str = self.questions_data[q]["Questions"]
-                self.result[q] = self.submissions.apply(process_row, axis=1)
+                self.result[[q, f"{q}_comment"]] = self.submissions.apply(process_row, axis=1)
                 metadata = self.convert_metadata(self.questions_data[q]["metadata"])
                 kwargs = self.gen_kwargs(metadata)
+                if not kwargs.get("comment", False):
+                    self.result.drop(columns=[f"{q}_comment"], inplace=True)
                 low_v = kwargs.get("normalize_low", 0)
                 high_v = kwargs.get("normalize_high", 100)
                 if kwargs.get("normalize", False):
@@ -406,6 +411,7 @@ class CheckOne:
         self.answer = answer
         self.correct = correct
         self.result = 0
+        self.comment = kwargs.get("comment", "")
         self.config = config
         self.build_chain()
 
@@ -554,14 +560,13 @@ class CheckOne:
             params = method_dict["params"]
             method(*params)
 
-
     def __read_file(self):
         extension = self.kwargs.get("extension", "csv")
         self.answer = self.__download(extension)
         correct_df = pd.read_csv(self.correct)
         answer_df = pd.read_csv(self.answer)
         return correct_df, answer_df
-    
+
     def __copy_correct_file(self, path):
         shutil.copy2(self.correct, path)
         self.correct = os.path.join(path, os.path.basename(self.correct))
@@ -602,7 +607,9 @@ class CheckOne:
                 shutil.copyfile(self.answer, filepath)
         elif os.path.isdir(self.answer):
             # If answer is a directory, copy all files in it to the target folder
-            if not os.path.exists(f"{folder}/{filename}") or self.kwargs.get("force_download", False):
+            if not os.path.exists(f"{folder}/{filename}") or self.kwargs.get(
+                "force_download", False
+            ):
                 shutil.copytree(self.answer, f"{folder}/{filename}")
             return f"{folder}/{filename}"  # Return the path to the folder with all copied files
         else:
@@ -755,12 +762,12 @@ class CheckOne:
             # Change to the directory of the test file
             test_dir = os.path.join(original_dir, os.path.dirname(test_file_path))
             os.chdir(test_dir)
-            
+
             # Run the test file
             result = subprocess.run(
-                [sys.executable, os.path.basename(test_file_path)], 
-                capture_output=True, 
-                encoding='utf-8'
+                [sys.executable, os.path.basename(test_file_path)],
+                capture_output=True,
+                encoding="utf-8",
             )
             return result
         finally:
@@ -810,6 +817,10 @@ class CheckOne:
         Parse the output of the test run and extract the number of tests run, passed, and failed.
         """
         test_output = self.__safety_run_tests(extract_code)
+        if isinstance(self.kwargs.get("comment", False), str):
+            self.comment = self.kwargs.get("comment")
+        elif self.kwargs.get("comment", False):
+            self.comment = f"Test output: {test_output}"
         # Extract the number of tests run, passed, and failed
         match = re.search(r"Ran (\d+) test", test_output)
         if match:
@@ -818,7 +829,8 @@ class CheckOne:
             tests_run = 0
 
         match_failures_errors = re.search(
-            re.compile(r"(?:FAILED \(errors=(\d+)\)|FAILURES?=(\d+))", re.IGNORECASE), test_output
+            re.compile(r"(?:FAILED \(errors=(\d+)\)|FAILURES?=(\d+))", re.IGNORECASE),
+            test_output,
         )
         if match_failures_errors:
             tests_failed = (

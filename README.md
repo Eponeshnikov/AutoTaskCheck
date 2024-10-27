@@ -276,6 +276,7 @@ Specified in `metadata` list for each question.
 | `error_funcs` | Error functions to use for "data" questions. | ⚙️ Optional | "neg_mean_squared_error" | [List of errors](https://scikit-learn.org/stable/modules/model_evaluation.html#common-cases-predefined-values) |
 | `sum_points_method` | How to combine errors for "data". | ⚙️ Optional | "mean" | "mean", "min", "max" etc                                                                                       |
 | `extension` | File format extension | ⚙️ Optional | `'py'` | File format extensions (e.g., `'csv'`, `'xlsx'`, `'json'`, etc.)                                               |
+| `comment` | Add comment column (if `code` or `project`) - could be output of unittest| ⚙️ Optional | `False` | `True`, `False`, `str`                                               |
 
 &nbsp;
 ## Parameter Insights and Practical Implementations

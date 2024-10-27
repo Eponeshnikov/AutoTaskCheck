@@ -147,6 +147,7 @@ with st.expander("Questions for checking", expanded=True):
                 help="metadata isn't editable, edit in config file and re-upload",
             )
         },
+        use_container_width=True,
     )
 questions_data_df = questions_data_df.T
 dataloader.questions_data_df = questions_data_df
@@ -157,14 +158,14 @@ dataloader.questions_data_df = questions_data_df
 # Check submissions
 st.header("Submissions")
 # Perform checking on submissions
-st.dataframe(submissions)
+st.dataframe(submissions, use_container_width=True)
 result = perform_checking(questions_data_df, submissions, dataloader.user_inputs)
 dataloader.results = result
 result = change_col_names()
 st.header("Results")
 show_button = st.checkbox("Show as table", value=True)
 if show_button:
-    st.dataframe(result)
+    st.dataframe(result, use_container_width=True)
 else:
     st.write(result.to_html(show_dimensions=True), unsafe_allow_html=True)
 
@@ -190,22 +191,22 @@ with cols[2]:
     save_checkbox = st.checkbox("Write without new results")
 
 with cols[0]:
-    st.button(
+    if st.button(
         label="Write results",
-        on_click=lambda: dataloader.write_results(
+        disabled=list_id is None and is_matching_list,
+    ):
+        dataloader.write_results(
             save_only_match=save_checkbox, filename=filename, write_mode=write_mode
-        ),
-        disabled=list_id is None or not is_matching_list,
-    )
+        )
 
 with cols[1]:
-    st.button(
+    if st.button(
         label="Write short results",
-        on_click=lambda: dataloader.write_results(
+        disabled=list_id is None and is_matching_list,
+    ):
+        dataloader.write_results(
             short=True,
             save_only_match=save_checkbox,
             filename=filename,
             write_mode=write_mode,
-        ),
-        disabled=list_id is None or not is_matching_list,
-    )
+        )
