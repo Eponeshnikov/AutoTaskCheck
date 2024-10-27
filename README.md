@@ -250,7 +250,7 @@ Specified under `questions` in the config file.
 | `weight`                    | Number of points the question is worth. | ⚙️ Optional | 0 | Number                                                                                        |
 
 ###
-The `answer` parameter defines the submitted data for evaluation, provided either as a text string or a path referring to `.py` test files (without extension) or correct dataframe files (with extension).
+The `answer` parameter defines the submitted data for evaluation, provided either as a text string or a path referring to `.py` test files (with extension) or correct dataframe files (with extension).
 
 ---
 
@@ -340,6 +340,7 @@ The `check_type` parameter in the configuration file enables the customization o
 - `hard`: Requires an exact match between the submitted answer and the expected answer.
 - `soft`: Executes a fuzzy string match with customized high and low thresholds to accommodate variations in the answer.
 - `code`: Evaluates submitted code by running specific tests against the extracted code snippets. The "answer" in the configuration should be the path to the unit test (using the **unittest** library) to test the provided functions or classes.
+- `project`: Similar to `code`, but directly copies the unit test to the submitted project folder and runs it. Useful for integrated testing setups where the code and tests are run together.
 - `data`: Validates submitted data frames or structured data.
 - `num`: Checks numeric answers, allowing a specified relative tolerance (**rtol**) range for comparison. Formula for calculating tolerance for two numbers $a - answer, b - correct\_answer$:  $absolute(a - b) <= 1e-8 + rtol * absolute(b)$. If this condition is met, then the answer is counted as correct.
 - `normalize`:  Normalizes the result by dividing by a specified coefficient
@@ -382,6 +383,7 @@ The `data` method is applied here, specifying the validation of submitted data f
 | `hard`            | Requires an exact match between the submitted answer and the expected answer.                              | -       | -                                        |
 | `soft`            | Executes a fuzzy string match with customized high and low thresholds to accommodate variations in the answer. | -       | -                                        |
 | `code`            | Evaluates submitted code by running specific tests against the extracted code snippets.                    | -       | -                                        |
+| `project`         | Similar to `code`, but directly copies the unit test to the submitted project folder and runs it.                   | -       | -                                        |
 | `data`            | Validates submitted data frames or structured data.                                                        | -       | -                                        |
 | `num`             | Checks numeric answers, allowing a specified relative tolerance (**rtol**) range for comparison.         | 0.02    | numeric                                        |
 | `threshlow`       | Establishes the lower limit or boundary for submitted values.                                                | 50      | numeric                                         |
