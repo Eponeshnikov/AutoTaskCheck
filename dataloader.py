@@ -74,8 +74,8 @@ class DataLoader:
                 match_list_file_name = self.match_list_file.name
             except AttributeError:
                 match_list_file_name = filename
-        file_name, file_ext = os.path.splitext(match_list_file_name)
         file_name = file_name if filename is None else filename
+        file_name, file_ext = os.path.splitext(match_list_file_name)
         if short:
             try:
                 info_columns = merged_df[["Info"]]
