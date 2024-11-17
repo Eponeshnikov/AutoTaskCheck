@@ -3,7 +3,7 @@ from fuzzywuzzy import fuzz
 import sys
 import numpy as np
 import random, string
-from yadisk import YaDisk
+from yadisk import YaDisk, Client
 import os
 import ast
 import subprocess
@@ -154,7 +154,8 @@ class Check:
                     self.result[q] = self.result[q].round(
                         np.max([number_of_dec(i) for i in self.result[q]])
                     )
-        my_bar.empty()
+            progress = 0
+            my_bar.empty()
         self.result.set_index(
             pd.Index(self.submissions[self.user_params["id"]]), inplace=True
         )
@@ -583,6 +584,14 @@ class CheckOne:
         def randomword(length):
             letters = string.ascii_lowercase
             return "".join(random.choice(letters) for i in range(length))
+        
+        def convert_to_old_format(answer):
+            # Use regex to find the substring starting with `?idApp=` and ending with the last `%2F`
+            converted_path = re.sub(r"\?idApp=.*%2F", "/", answer)
+            # Replace any remaining `%2F` with `/` to finalize the format
+            converted_path = converted_path.replace("%2F", "/")
+            # Extract the final path part if `https://disk.yandex.ru/client/disk/` is present
+            return converted_path
 
         basename = (
             os.path.basename(self.answer)
@@ -597,8 +606,14 @@ class CheckOne:
         # Download submission file from Yandex Disk
         if validators.url(self.answer):
             if not os.path.exists(filepath) or self.kwargs.get("force_download", False):
+                if "idApp=" in self.answer and "idDialog=" in self.answer:
+                    # Extract the necessary part of the link for new format
+                    file_id = convert_to_old_format(self.answer).split("https://disk.yandex.ru/client/disk/")[-1]
+                else:
+                    # Extract the necessary part of the link for old format
+                    file_id = self.answer.split("https://disk.yandex.ru/client/disk/")[-1]
                 y.download(
-                    self.answer.split("https://disk.yandex.ru/client/disk/")[-1],
+                    file_id,
                     filepath,
                 )
         elif os.path.isfile(self.answer):
@@ -710,7 +725,7 @@ class CheckOne:
             parsed_code = ast.parse(answer_code)
         except Exception as e:
             print(e)
-            with open(f"{self.correct}", "r", encoding="utf-8") as my_file:
+            with open(f"{self.correct}.py", "r", encoding="utf-8") as my_file:
                 my_content = my_file.read()
             test_file = self.answer.split(".")[0] + "_test" + ".py"
             # Save the modified content as new_my.py
@@ -821,27 +836,27 @@ class CheckOne:
             self.comment = self.kwargs.get("comment")
         elif self.kwargs.get("comment", False):
             self.comment = f"Test output: {test_output}"
-        # Extract the number of tests run, passed, and failed
+        # Extract number of tests run
         match = re.search(r"Ran (\d+) test", test_output)
         if match:
             tests_run = int(match.group(1))
         else:
             tests_run = 0
 
+        # Updated regex to handle failures, errors, or both
         match_failures_errors = re.search(
-            re.compile(r"(?:FAILED \(errors=(\d+)\)|FAILURES?=(\d+))", re.IGNORECASE),
-            test_output,
+            r"FAILED \((?:failures=(\d+))?,?\s*(?:errors=(\d+))?\)", test_output
         )
+
         if match_failures_errors:
-            tests_failed = (
-                int(match_failures_errors.group(1))
-                if match_failures_errors.group(1)
-                else int(match_failures_errors.group(2))
-            )
+            # Extract failures and errors, default to 0 if not found
+            tests_failed = int(match_failures_errors.group(1)) if match_failures_errors.group(1) else 0
+            tests_errors = int(match_failures_errors.group(2)) if match_failures_errors.group(2) else 0
         else:
             tests_failed = 0
+            tests_errors = 0
 
-        tests_passed = tests_run - tests_failed
+        tests_passed = tests_run - tests_failed - tests_errors
         return tests_run, tests_passed
 
 

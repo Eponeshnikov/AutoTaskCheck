@@ -250,7 +250,7 @@ Specified under `questions` in the config file.
 | `weight`                    | Number of points the question is worth. | ⚙️ Optional | 0 | Number                                                                                        |
 
 ###
-The `answer` parameter defines the submitted data for evaluation, provided either as a text string or a path referring to `.py` test files (with extension) or correct dataframe files (with extension).
+The `answer` parameter defines the submitted data for evaluation, provided either as a text string or a path referring to `.py` test files (with extension  for `project` and without for `code`) or correct dataframe files (with extension).
 
 ---
 
