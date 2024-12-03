@@ -625,6 +625,8 @@ class CheckOne:
             if not os.path.exists(f"{folder}/{filename}") or self.kwargs.get(
                 "force_download", False
             ):
+                if os.path.exists(f"{folder}/{filename}"):
+                    shutil.rmtree(f"{folder}/{filename}")
                 shutil.copytree(self.answer, f"{folder}/{filename}")
             return f"{folder}/{filename}"  # Return the path to the folder with all copied files
         else:
