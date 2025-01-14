@@ -815,7 +815,7 @@ class CheckOne:
             result = self.__run_tests(test_file)
             test_output = str(result.stdout) + str(result.stderr)
             error_message = re.search(
-                r"ModuleNotFoundError: No module named \\'(.*?)\\'", test_output
+                r"ModuleNotFoundError: No module named '(.*?)'", test_output
             )
             if error_message:
                 if (
@@ -857,7 +857,6 @@ class CheckOne:
         else:
             tests_failed = 0
             tests_errors = 0
-
         tests_passed = tests_run - tests_failed - tests_errors
         return tests_run, tests_passed
 
