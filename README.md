@@ -22,31 +22,38 @@ This is an automated checking system for grading student assignments and tests. 
 
 ## Installation
 
-Clone repository:
-
-```bash
-git clone https://github.com/Eponeshnikov/AutoTaskCheck.git
-```
-
-Requires Python 3.10+. Install requirements:
-
-```bash
-pip install -r requirements.txt
-```
+Requires Python 3.12+. Dependency versions are pinned in `uv.lock`.
 
 ### Windows
 
-Run `install.bat` (double click). It installs [uv](https://docs.astral.sh/uv/), Python and all
-dependencies into `.venv`, and creates an `AutoTaskCheck` shortcut on the Desktop.
-Then start the app with that shortcut or `run.bat`.
+1. Download the repository (`git clone` or GitHub Desktop; a ZIP download may break `.bat` line endings).
+2. Double-click `install.bat`. It:
+   - installs [uv](https://docs.astral.sh/uv/) if it is missing;
+   - installs Python 3.12 and the locked dependencies into `.venv`;
+   - creates an `AutoTaskCheck` shortcut on the Desktop.
+3. Start the app with the `AutoTaskCheck` shortcut or `run.bat`.
+
+An internet connection is needed for the first install.
+
+### Linux / macOS
+
+```bash
+git clone https://github.com/Eponeshnikov/AutoTaskCheck.git
+cd AutoTaskCheck
+uv sync --frozen
+```
+
+Without uv: `pip install -r requirements.txt` (versions are not pinned there).
 
 ## Usage
 
 To run checker:
 
 ```bash
-streamlit run 1_📈_AutoChecker.py
+uv run --frozen streamlit run 1_📈_AutoChecker.py
 ```
+
+On Windows just use the shortcut or `run.bat`.
 
 Go to:
 ```plaintext
