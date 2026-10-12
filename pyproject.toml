@@ -1,0 +1,17 @@
+[project]
+name = "autotaskcheck"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fuzzywuzzy>=0.18.0",
+    "numpy>=2.2.4",
+    "openpyxl>=3.1.5",
+    "pandas>=2.2.3",
+    "pyyaml>=6.0.2",
+    "scikit-learn>=1.6.1",
+    "streamlit>=1.44.1",
+    "validators>=0.34.0",
+    "yadisk>=3.2.0",
+]

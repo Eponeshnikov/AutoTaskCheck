@@ -34,6 +34,12 @@ Requires Python 3.10+. Install requirements:
 pip install -r requirements.txt
 ```
 
+### Windows
+
+Run `install.bat` (double click). It installs [uv](https://docs.astral.sh/uv/), Python and all
+dependencies into `.venv`, and creates an `AutoTaskCheck` shortcut on the Desktop.
+Then start the app with that shortcut or `run.bat`.
+
 ## Usage
 
 To run checker:
