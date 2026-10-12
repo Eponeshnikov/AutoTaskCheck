@@ -24,7 +24,7 @@ if errorlevel 1 (
 
 :: 2. Python и зависимости в .venv
 echo [2/3] Устанавливаю Python и зависимости...
-uv sync
+uv sync --frozen
 if errorlevel 1 (
     echo ОШИБКА: не удалось установить зависимости
     pause
