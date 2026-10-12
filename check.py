@@ -785,6 +785,9 @@ class CheckOne:
                 [sys.executable, os.path.basename(test_file_path)],
                 capture_output=True,
                 encoding="utf-8",
+                errors="replace",
+                # Force the child's stdio to UTF-8 (Windows defaults to cp1251/cp866)
+                env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
             )
             return result
         finally:
